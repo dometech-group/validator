@@ -182,7 +182,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $this->validateGenericNode(
                 $propertyValue,
                 $object,
-                $cacheKey.':'.$object::class.':'.$propertyName,
+                $cacheKey . ':' . $object::class . ':' . $propertyName,
                 $propertyMetadata,
                 $propertyPath,
                 $groups,
@@ -232,7 +232,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $this->validateGenericNode(
                 $value,
                 $object,
-                $cacheKey.':'.$class.':'.$propertyName,
+                $cacheKey . ':' . $class . ':' . $propertyName,
                 $propertyMetadata,
                 $propertyPath,
                 $groups,
@@ -332,12 +332,17 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      */
     private function validateEachObjectIn(iterable $collection, string $propertyPath, array $groups, ExecutionContextInterface $context): void
     {
+
+        if ($collection instanceof \Doctrine\Common\Collections\Collection) {
+            $collection = $collection->getValues();
+        }
+
         foreach ($collection as $key => $value) {
             if (\is_array($value)) {
                 // Also traverse nested arrays
                 $this->validateEachObjectIn(
                     $value,
-                    $propertyPath.'['.$key.']',
+                    $propertyPath . '[' . $key . ']',
                     $groups,
                     $context
                 );
@@ -349,7 +354,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             if (\is_object($value)) {
                 $this->validateObject(
                     $value,
-                    $propertyPath.'['.$key.']',
+                    $propertyPath . '[' . $key . ']',
                     $groups,
                     TraversalStrategy::IMPLICIT,
                     $context
@@ -498,7 +503,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 }
 
                 if ($propertyMetadata instanceof GetterMetadata) {
-                    $propertyValue = new LazyProperty(static fn () => $propertyMetadata->getPropertyValue($object));
+                    $propertyValue = new LazyProperty(static fn() => $propertyMetadata->getPropertyValue($object));
                 } else {
                     $propertyValue = $propertyMetadata->getPropertyValue($object);
                 }
@@ -506,7 +511,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $this->validateGenericNode(
                     $propertyValue,
                     $object,
-                    $cacheKey.':'.$object::class.':'.$propertyName,
+                    $cacheKey . ':' . $object::class . ':' . $propertyName,
                     $propertyMetadata,
                     PropertyPath::append($propertyPath, $propertyName),
                     $groups,
